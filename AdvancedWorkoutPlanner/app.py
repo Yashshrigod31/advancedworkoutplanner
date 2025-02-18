@@ -43,12 +43,12 @@ def get_db_connection():
         auth_plugin="mysql_native_password"
     )
 
-# Home Route
+
 @app.route('/')
 def home():
     return redirect(url_for('login'))
 
-# Sign-Up Route
+
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
@@ -81,12 +81,11 @@ def sign_up():
     return render_template('sign_up.html')
 
 
-# Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
     if request.method == 'POST':
-        session.permanent=True  # Extend session if user logs in again
+        session.permanent=True  
     
     if request.method == 'POST':
         username = request.form['username']
@@ -109,14 +108,12 @@ def login():
 
     return render_template('login.html')
 
-# Logout Route
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     flash("You have been logged out.", "success")
     return redirect(url_for('login'))
 
-# Dashboard Route
 @app.route('/dashboard')
 def dashboard():
     if 'username' not in session:
@@ -131,19 +128,18 @@ def dashboard():
 
     return render_template('dashboard.html', workouts=workouts)
 
-# Profile Route
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'username' not in session:
-        return redirect(url_for('login'))  # Redirect to login if not logged in
+        return redirect(url_for('login'))  
     
     username = session['username']
     connection = get_db_connection()
     cursor = connection.cursor()
     
-    # Fetch user details from the database
+   
     cursor.execute("SELECT username, email, weight, height, age, created_at FROM users WHERE username = %s", (username,))
-    user = cursor.fetchone()  # Fetch a single row as a tuple
+    user = cursor.fetchone() 
     
     if user:
         user = {
@@ -162,26 +158,23 @@ def profile():
 
 
 
-# Edit Profile Route
+
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
     if 'username' not in session:
-        return redirect(url_for('login'))  # Redirect to login if not logged in
+        return redirect(url_for('login')) 
 
     username = session['username']
     
-    # Open database connection
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    # Fetch user details
     cursor.execute("SELECT username, email, weight, height, age FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
 
     if not user:
         flash("User not found!", "error")
-        return redirect(url_for('dashboard'))  # Redirect if user doesn't exist
-
+        return redirect(url_for('dashboard')) 
     if request.method == 'POST':
         new_email = request.form['email']
         new_weight = request.form['weight']
@@ -189,10 +182,10 @@ def edit_profile():
         new_age = request.form['age']
         new_password = request.form['password']
 
-        # Hash new password with bcrypt
+     
         new_password_hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
 
-        # Update user info
+
         cursor.execute(
             "UPDATE users SET email = %s, weight = %s, height = %s, age = %s, password = %s WHERE username = %s",
             (new_email, new_weight, new_height, new_age, new_password_hashed, username)
@@ -202,23 +195,21 @@ def edit_profile():
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))
 
-    # Close connection properly
+
     cursor.close()
     connection.close()
 
     return render_template('edit_profile.html', user=user)
 
 
-# MET values for different intensities or categories
+
 MET_VALUES = {
-    'low': 3,        # Light workout (walking, light stretching)
-    'medium': 6,     # Moderate workout (jogging, swimming)
-    'high': 10     # Vigorous workout (running, cycling fast)
+    'low': 3,        
+    'medium': 6,     
+    'high': 10     
 }
 
 
-# Add Workout Route
-# Add Workout Route
 @app.route('/add_workout', methods=['GET', 'POST'])
 def add_workout():
     if 'username' not in session:
@@ -232,41 +223,38 @@ def add_workout():
         duration = request.form['duration']
         intensity = request.form['intensity']
         category = request.form['category']
-        date = request.form['date']  # Getting date from the form
-
-        # Ensure the date is in the correct format (if needed)
+        date = request.form['date']  
         try:
-            date = datetime.strptime(date, "%Y-%m-%d").date()  # Convert the string date to a Python date object
+            date = datetime.strptime(date, "%Y-%m-%d").date() 
         except ValueError:
             flash("Invalid date format.", "error")
             return redirect(url_for('add_workout'))
 
-        # Convert duration to a number (float or int)
+       
         try:
-            duration = float(duration)  # Convert the string to a float (could also use int)
+            duration = float(duration) 
         except ValueError:
             flash("Invalid duration value. Please enter a valid number.", "error")
             return redirect(url_for('add_workout'))
 
-        # Convert duration to hours (assuming duration is in minutes)
+        
         duration_in_hours = duration / 60
 
-        # Calculate calories burned based on intensity and duration
         if intensity.lower() not in MET_VALUES:
             flash("Invalid intensity value!", "error")
             return redirect(url_for('add_workout'))
 
-        # Let's assume a user weight (for simplicity, you can store it in the user's profile or ask for it)
-        user_weight_kg = 70  # User's weight in kg, replace with actual value from the profile
+
+        user_weight_kg = 70  
 
         met_value = MET_VALUES[intensity.lower()]
         calories_burned = met_value * user_weight_kg * duration_in_hours
 
-        # Database connection
+        
         connection = get_db_connection()
         cursor = connection.cursor()
 
-        # Insert workout data into the database, including the date
+        
         query = """
             INSERT INTO workouts (username, workout_name, description, duration, intensity, date, category, calories_burned)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
@@ -276,7 +264,7 @@ def add_workout():
         connection.commit()
 
         flash("Workout added successfully!", "success")
-        return redirect(url_for('dashboard'))  # Redirect to dashboard or another page
+        return redirect(url_for('dashboard'))  
     
     from datetime import date
     today = date.today()
