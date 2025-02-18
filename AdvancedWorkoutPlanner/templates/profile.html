@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block title %}Profile - Workout Planner{% endblock
+%} {% block head %}<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/profile.css') }}"
+/>{% endblock %} {% block content %}
+<div class="section">
+  <h2>Your Profile</h2>
+  <table class="profile-table">
+    <tr>
+      <th>Field</th>
+      <th>Details</th>
+    </tr>
+    <tr>
+      <td><strong>Username</strong></td>
+      <td>{{ user.username }}</td>
+    </tr>
+    <tr>
+      <td><strong>Email</strong></td>
+      <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+      <td><strong>Height</strong></td>
+      <td>{{ user.height }}</td>
+    </tr>
+    <tr>
+      <td><strong>Weight</strong></td>
+      <td>{{ user.weight }}</td>
+    </tr>
+    <tr>
+      <td><strong>Age</strong></td>
+      <td>{{ user.age }}</td>
+    </tr>
+    <tr>
+      <td><strong>Account Created At</strong></td>
+      <td>{{ user.created_at }}</td>
+    </tr>
+  </table>
+  <a href="{{ url_for('edit_profile') }}" class="btn">Edit Profile</a>
+</div>
+{% endblock %}

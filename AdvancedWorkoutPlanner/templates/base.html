@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Workout Planner{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    {% block head %}{% endblock %}
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <a href="{{ url_for('dashboard') }}">
+        <i class="bi bi-house"></i> Dashboard
+      </a>
+      <a href="{{ url_for('add_workout') }}">
+        <i class="bi bi-plus-circle"></i> Add Workout
+      </a>
+      <a href="/about"> <i class="bi bi-info-circle"></i> About </a>
+      <a href="{{ url_for('profile') }}">
+        <i class="bi bi-person-circle"></i> Profile
+      </a>
+      {% if 'username' in session %}
+      <a href="{{ url_for('logout') }}">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+      {% endif %}
+    </nav>
+    {% block content %}{% endblock %}
+  </body>
+</html>
